@@ -69,7 +69,7 @@ def export_data(bot: Bot, update: Update):
 __mod_name__ = "Yedekler"
 
 __help__ = """
-*Admin only:*
+*Sadece yöneticiler:*
  - /import: GroupButler yedeğini bu komut ile içe aktarabilirsiniz! Not \
 Resimler ve dosyalar telegram kısıtlaması seçeneğiyle aktarılamaz.
  - /export: !!! Henüz bir komut değil. Yakında eklenecektir!
