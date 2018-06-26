@@ -35,8 +35,8 @@ def check_flood(bot: Bot, update: Update) -> str:
 
     try:
         chat.kick_member(user.id)
-        msg.reply_text("I like to leave the flooding to natural disasters. But you, you were just a "
-                       "disappointment. Get out.")
+        msg.reply_text("Kullanıcı Flood yaptığı için gruptan"
+                       "uzaklaştırıldı.")
 
         return "<b>{}:</b>" \
                "\n#BANNED" \
@@ -45,7 +45,7 @@ def check_flood(bot: Bot, update: Update) -> str:
                                              mention_html(user.id, user.first_name))
 
     except BadRequest:
-        msg.reply_text("I can't kick people here, give me permissions first! Until then, I'll disable antiflood.")
+        msg.reply_text("Burada insanları gruptan atamam. Önce bana yetki ver.")
         sql.set_flood(chat.id, 0)
         return "<b>{}:</b>" \
                "\n#INFO" \
@@ -65,25 +65,25 @@ def set_flood(bot: Bot, update: Update, args: List[str]) -> str:
         val = args[0].lower()
         if val == "off" or val == "no" or val == "0":
             sql.set_flood(chat.id, 0)
-            message.reply_text("Antiflood has been disabled.")
+            message.reply_text("Flood engellemesi devre dışı.")
 
         elif val.isdigit():
             amount = int(val)
             if amount <= 0:
                 sql.set_flood(chat.id, 0)
-                message.reply_text("Antiflood has been disabled.")
+                message.reply_text("Flood engellemesi devre dışı.")
                 return "<b>{}:</b>" \
                        "\n#SETFLOOD" \
                        "\n<b>Admin:</b> {}" \
                        "\nDisabled antiflood.".format(html.escape(chat.title), mention_html(user.id, user.first_name))
 
             elif amount < 3:
-                message.reply_text("Antiflood has to be either 0 (disabled), or a number bigger than 3!")
+                message.reply_text("Flood engelleme 0 (devre dışı) veya 3'ten büyük bir sayı olmalıdır.!")
                 return ""
 
             else:
                 sql.set_flood(chat.id, amount)
-                message.reply_text("Antiflood has been updated and set to {}".format(amount))
+                message.reply_text("Flood engelleme güncellendi ve {} mesaja ayarlandı".format(amount))
                 return "<b>{}:</b>" \
                        "\n#SETFLOOD" \
                        "\n<b>Admin:</b> {}" \
@@ -91,7 +91,7 @@ def set_flood(bot: Bot, update: Update, args: List[str]) -> str:
                                                                     mention_html(user.id, user.first_name), amount)
 
         else:
-            message.reply_text("Unrecognised argument - please use a number, 'off', or 'no'.")
+            message.reply_text("Tanınmayan argüman - lütfen bir sayı kullanın, kapatmak istiyorsanız 'off' veya 'no' kullanın")
 
     return ""
 
@@ -102,10 +102,10 @@ def flood(bot: Bot, update: Update):
 
     limit = sql.get_flood_limit(chat.id)
     if limit == 0:
-        update.effective_message.reply_text("I'm not currently enforcing flood control!")
+        update.effective_message.reply_text("Flood kontrolü yapmıyorum!")
     else:
         update.effective_message.reply_text(
-            "I'm currently banning users if they send more than {} consecutive messages.".format(limit))
+            "Şu anda kullanıcıları {} ardışık mesajdan daha fazlasını gönderiyorlarsa yasaklıyorum..".format(limit))
 
 
 def __migrate__(old_chat_id, new_chat_id):
@@ -121,13 +121,13 @@ def __chat_settings__(chat_id, user_id):
 
 
 __help__ = """
- - /flood: Get the current flood control setting
+ - /flood: Mevcut flood ayarlarını görüntüle
 
-*Admin only:*
- - /setflood <int/'no'/'off'>: enables or disables flood control
+*Sadece yöneticiler:*
+ - /setflood <sayı/'no'/'off'>: Flood kontrolünü etkinleştir veya devre dışı bırak
 """
 
-__mod_name__ = "AntiFlood"
+__mod_name__ = "Flood Engelleme"
 
 FLOOD_BAN_HANDLER = MessageHandler(Filters.all & ~Filters.status_update & Filters.group, check_flood)
 SET_FLOOD_HANDLER = CommandHandler("setflood", set_flood, pass_args=True, filters=Filters.group)
